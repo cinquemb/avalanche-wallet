@@ -5,15 +5,12 @@ process.env.VUE_APP_VERSION = process.env.npm_package_version
 module.exports = {
     transpileDependencies: ['vuetify'],
     devServer: {
-        /**
-         * For e2e testing we turn this off using vue cli --mode e2e
-         * @link https://cli.vuejs.org/guide/mode-and-env.html#modes
-         */
         https: !process.env.USE_HTTP,
         port: 5000,
         before: beforeMiddleware,
         onListening: onListening,
     },
+    //devServer: {     port: 3000,     proxy: "https://api.avax.network:443"   },
     // publicPath: '',
     configureWebpack: {
         optimization: {

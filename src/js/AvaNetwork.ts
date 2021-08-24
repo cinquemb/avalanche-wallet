@@ -60,7 +60,7 @@ class AvaNetwork {
         }
     }
     getFullURL() {
-        return `${this.protocol}://${this.ip}:${this.port}`
+        return `${this.protocol}://${this.ip}:${this.port}/api`
     }
 }
 

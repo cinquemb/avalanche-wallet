@@ -69,7 +69,7 @@ export default class EditPage extends Vue {
         let net = this.net
 
         this.name = net.name
-        this.url = net.getFullURL()
+        this.url = net.url
         this.networkId = net.networkId
         this.explorer_api = net.explorerUrl
         this.explorer_site = net.explorerSiteUrl
@@ -94,41 +94,6 @@ export default class EditPage extends Vue {
         // protect against homograph attack: https://hethical.io/homograph-attack-using-internationalized-domain-name/
         url = punycode.toASCII(url)
         this.url = url
-
-        // must contain http / https prefix
-        if (url.substr(0, 7) !== 'http://' && url.substr(0, 8) !== 'https://') {
-            this.err_url = 'URLs require the appropriate HTTP/HTTPS prefix.'
-            return false
-        }
-
-        let split = url.split('://')
-        let rest = split[1]
-
-        // must have base ip
-        if (rest.length === 0) {
-            this.err_url = 'Invalid URL.'
-            return false
-        }
-
-        // Must have port
-        if (!rest.includes(':')) {
-            this.err_url = 'You must specify the port of the url.'
-            return false
-        }
-        // Port must be number
-
-        let urlSplit = rest.split(':')
-        if (urlSplit.length === 0) {
-            this.err_url = 'Invalid port.'
-            return false
-        }
-
-        let port = parseInt(urlSplit[1])
-
-        if (isNaN(port)) {
-            this.err_url = 'Invalid port.'
-            return false
-        }
 
         this.err_url = ''
         return true

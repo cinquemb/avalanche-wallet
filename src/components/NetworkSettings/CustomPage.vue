@@ -86,47 +86,6 @@ export default class CustomPage extends Vue {
     checkUrl() {
         let err = ''
         let url = this.url
-        // protect against homograph attack: https://hethical.io/homograph-attack-using-internationalized-domain-name/
-
-        url = punycode.toASCII(url)
-        this.url = url
-
-        // must contain http / https prefix
-        if (url.substr(0, 7) !== 'http://' && url.substr(0, 8) !== 'https://') {
-            this.err_url = 'URLs require the appropriate HTTP/HTTPS prefix.'
-            return false
-        }
-
-        let split = url.split('://')
-        let rest = split[1]
-
-        // must have base ip
-        if (rest.length === 0) {
-            this.err_url = 'Invalid URL.'
-            return false
-        }
-
-        // Must have port
-        if (!rest.includes(':')) {
-            this.err_url = 'You must specify the port of the url.'
-            return false
-        }
-
-        // Port must be number
-        let urlSplit = rest.split(':')
-        if (urlSplit.length === 0) {
-            this.err_url = 'Invalid port.'
-            return false
-        }
-
-        let port = parseInt(urlSplit[1])
-
-        if (isNaN(port)) {
-            this.err_url = 'Invalid port.'
-            return false
-        }
-
-        this.err_url = ''
         return true
     }
     errCheck() {
@@ -157,7 +116,7 @@ export default class CustomPage extends Vue {
         let netID = null
 
         try {
-            let resp = await axios.post(this.url + '/ext/info', {
+            let resp = await axios.post(this.url + '/api/ext/info', {
                 jsonrpc: '2.0',
                 id: 1,
                 method: 'info.getNetworkID',

@@ -129,7 +129,7 @@ const network_module: Module<NetworkState, RootState> = {
             explorer_api.defaults.baseURL = net.explorerUrl
 
             // Set web3 Network Settings
-            let web3Provider = `${net.protocol}://${net.ip}:${net.port}/ext/bc/C/rpc`
+            let web3Provider = `${net.protocol}://${net.ip}:${net.port}/api/ext/bc/C/rpc`
             web3.setProvider(web3Provider)
 
             commit('Assets/removeAllAssets', null, { root: true })
@@ -168,10 +168,10 @@ const network_module: Module<NetworkState, RootState> = {
             // let netTest = new AvaNetwork("Everest TestNet", 'https://api.avax-test.network:443', 4, 'https://explorerapi.avax.network');
             let manhattan = new AvaNetwork(
                 'Mainnet',
-                'https://api.avax.network:443',
+                'https://localhost:8089/api',
                 1,
-                'https://explorerapi.avax.network',
-                'https://explorer.avax.network',
+                'https://localhost:8089/explorerapi',
+                'https://localhost:8089/explorer',
                 true
             )
             let fuji = new AvaNetwork(
