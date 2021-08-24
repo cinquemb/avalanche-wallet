@@ -9,6 +9,7 @@ import BN from 'bn.js'
 import { getPreferredHRP } from 'avalanche/dist/utils'
 import router from '@/router'
 import { web3 } from '@/evm'
+import { setSocketNetwork } from '../../../providers'
 
 const network_module: Module<NetworkState, RootState> = {
     namespaced: true,
@@ -50,7 +51,7 @@ const network_module: Module<NetworkState, RootState> = {
             await dispatch('save')
         },
         saveSelectedNetwork({ state }) {
-            let data = JSON.stringify(state.selectedNetwork)
+            let data = JSON.stringify(state.selectedNetwork?.url)
             localStorage.setItem('network_selected', data)
         },
         async loadSelectedNetwork({ dispatch, getters }): Promise<boolean> {
@@ -62,7 +63,7 @@ const network_module: Module<NetworkState, RootState> = {
 
                 for (var i = 0; i < nets.length; i++) {
                     let net = nets[i]
-                    if (JSON.stringify(net) === data) {
+                    if (JSON.stringify(net.url) === data) {
                         dispatch('setNetwork', net)
                         return true
                     }
@@ -89,7 +90,8 @@ const network_module: Module<NetworkState, RootState> = {
                     let newCustom = new AvaNetwork(
                         n.name,
                         n.url,
-                        n.networkId,
+                        //@ts-ignore
+                        parseInt(n.networkId),
                         n.explorerUrl,
                         n.explorerSiteUrl,
                         n.readonly
@@ -100,6 +102,10 @@ const network_module: Module<NetworkState, RootState> = {
         },
         async setNetwork({ state, dispatch, commit, rootState }, net: AvaNetwork) {
             state.status = 'connecting'
+
+            // Chose if the network should use credentials
+            await net.updateCredentials()
+            ava.setRequestConfig('withCredentials', net.withCredentials)
             ava.setAddress(net.ip, net.port, net.protocol)
             ava.setNetworkID(net.networkId)
 
@@ -131,6 +137,9 @@ const network_module: Module<NetworkState, RootState> = {
             // Set web3 Network Settings
             let web3Provider = `${net.protocol}://${net.ip}:${net.port}/api/ext/bc/C/rpc`
             web3.setProvider(web3Provider)
+
+            // Set socket connections
+            setSocketNetwork(net)
 
             commit('Assets/removeAllAssets', null, { root: true })
             await dispatch('Assets/updateAvaAsset', null, { root: true })
@@ -165,8 +174,7 @@ const network_module: Module<NetworkState, RootState> = {
         },
 
         async init({ state, commit, dispatch }) {
-            // let netTest = new AvaNetwork("Everest TestNet", 'https://api.avax-test.network:443', 4, 'https://explorerapi.avax.network');
-            let manhattan = new AvaNetwork(
+            let mainnet = new AvaNetwork(
                 'Mainnet',
                 'https://localhost:8089/api',
                 1,
@@ -174,6 +182,7 @@ const network_module: Module<NetworkState, RootState> = {
                 'https://localhost:8089/explorer',
                 true
             )
+
             let fuji = new AvaNetwork(
                 'Fuji',
                 'https://api.avax-test.network:443',
@@ -190,8 +199,7 @@ const network_module: Module<NetworkState, RootState> = {
                 console.error(e)
             }
 
-            // commit('addNetwork', netTest);
-            commit('addNetwork', manhattan)
+            commit('addNetwork', mainnet)
             commit('addNetwork', fuji)
 
             try {

@@ -1,5 +1,3 @@
-const { beforeMiddleware, onListening } = require('./server/configure')
-
 process.env.VUE_APP_VERSION = process.env.npm_package_version
 
 module.exports = {
@@ -7,8 +5,6 @@ module.exports = {
     devServer: {
         https: !process.env.USE_HTTP,
         port: 5000,
-        before: beforeMiddleware,
-        onListening: onListening,
     },
     //devServer: {     port: 3000,     proxy: "https://api.avax.network:443"   },
     // publicPath: '',

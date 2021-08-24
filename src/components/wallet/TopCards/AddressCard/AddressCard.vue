@@ -53,8 +53,12 @@ import QRModal from '@/components/modals/QRModal.vue'
 import PaperWallet from '@/components/modals/PaperWallet/PaperWallet.vue'
 import QRCode from 'qrcode'
 import { KeyPair as AVMKeyPair } from 'avalanche/dist/apis/avm'
-import { WalletNameType, WalletType } from '@/store/types'
-import AvaHdWallet, { AVA_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from '@/js/wallets/AvaHdWallet'
+import { WalletType, WalletNameType } from '@/js/wallets/types'
+
+import MnemonicWallet, {
+    AVA_ACCOUNT_PATH,
+    LEDGER_ETH_ACCOUNT_PATH,
+} from '@/js/wallets/MnemonicWallet'
 import { LedgerWallet } from '@/js/wallets/LedgerWallet'
 
 import ChainSelect from '@/components/wallet/TopCards/AddressCard/ChainSelect.vue'
@@ -111,13 +115,22 @@ export default class AddressCard extends Vue {
     get addressMsg(): string {
         switch (this.chainNow) {
             default:
-                return this.$t('top.address.desc_x') as string
+                return this.getAddressMsgX()
             case 'P':
                 return this.$t('top.address.desc_p') as string
             case 'C':
                 return this.$t('top.address.desc_c') as string
         }
     }
+
+    getAddressMsgX() {
+        if (this.activeWallet?.type === 'singleton') {
+            return this.$t('top.address.desc_x_1') as string
+        } else {
+            return `${this.$t('top.address.desc_x_1')} ${this.$t('top.address.desc_x_2')}` as string
+        }
+    }
+
     get isDayTheme(): boolean {
         //@ts-ignore
         return this.$root.theme === 'day'
@@ -137,7 +150,7 @@ export default class AddressCard extends Vue {
         if (!wallet) {
             return '-'
         }
-        return wallet.getCurrentAddress()
+        return wallet.getCurrentAddressAvm()
     }
 
     get addressPVM() {
@@ -146,7 +159,7 @@ export default class AddressCard extends Vue {
             return '-'
         }
 
-        return wallet.getCurrentPlatformAddress()
+        return wallet.getCurrentAddressPlatform()
     }
 
     get addressEVM() {
@@ -171,7 +184,7 @@ export default class AddressCard extends Vue {
     }
 
     get activeIdx(): number {
-        const wallet = this.activeWallet as AvaHdWallet
+        const wallet = this.activeWallet as MnemonicWallet
         const walletType = wallet.type
 
         if (walletType === 'singleton') return 0
