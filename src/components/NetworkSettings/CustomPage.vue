@@ -107,7 +107,7 @@ export default class CustomPage extends Vue {
     async tryConnection(credential = false): Promise<number | null> {
         try {
             let resp = await axios.post(
-                this.url + '/ext/info',
+                this.url + '/api/ext/info',
                 {
                     jsonrpc: '2.0',
                     id: 1,
@@ -137,7 +137,6 @@ export default class CustomPage extends Vue {
         let credNum = await this.tryConnection(true)
         let noCredNum = await this.tryConnection()
         this.isAjax = false
-
 
         let validNetId = credNum || noCredNum
 
